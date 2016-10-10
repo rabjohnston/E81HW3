@@ -10,7 +10,7 @@ from sklearn.preprocessing import label_binarize
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import roc_curve, auc
 from sklearn.grid_search import GridSearchCV   #Performing grid search
-
+from sklearn.cross_validation import train_test_split
 
 def readFiles():
     #Reading files
@@ -40,26 +40,24 @@ def preprocessFeatures3( X ):
 
 
 
-def runModel(X,Y):
+def runModel(X_train, X_test, Y_train, Y_test):
     print('Run model')
     
-   
-    
-    m,n = Y.shape    
-    Y_predict = np.zeros((m, n), dtype=np.float)
+      
+    Y_predict = np.zeros(Y_test.shape, dtype=np.float)
     models = []
-    
-    for i in range(n):
+    print(Y_train.shape)
+    for i in range(Y_train.shape[1]):
         print('Random Forest: ', i)
         clf = RandomForestClassifier(
                 n_estimators=50, 
                 max_depth=32, 
                 min_samples_split=4, 
                 min_samples_leaf=4,
-                RandomState=None,   
+                random_state=24,   
                 oob_score=False)
-        clf.fit(X,Y[:,i])
-        Y_predict[:,i] = clf.predict_proba(X)[:,1]
+        clf.fit(X_train,Y_train[:,i])
+        Y_predict[:,i] = clf.predict_proba(X_test)[:,1]
         models.append(clf)
     print( Y_predict)
     
@@ -121,20 +119,17 @@ def main():
     Y = label_binarize(YOrig, classes=[1, 2, 3, 4])
     
     #Split into training and test set - where the latter is 15% of the total 
-    #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.15, random_state=10) 
-
-    
-
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.15, random_state=10) 
     
     
     # Run the model
-    Y_predict, clf = runModel(X,Y)
+    Y_predict, model = runModel(X_train, X_test, Y_train, Y_test)
     
-    baselineAUC = calculateROC(Y, Y_predict)
+    AUC = calculateROC(Y_test, Y_predict)
     
-    print('AUC is: ', baselineAUC)
+    print('AUC is: ', AUC)
     
-    createSubmission(clf)
+    #createSubmission(model)
 
     print('Completed')
  
