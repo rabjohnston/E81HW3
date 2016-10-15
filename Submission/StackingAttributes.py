@@ -24,7 +24,8 @@ class StackingAttributes:
         
         self._kn_n_neighbors=15
         self._kn_weights='distance'
-
+        self._kn_random_state = 2
+        self._kn_n_jobs=-1    
                                       
         self._X_train = X_train
         self._X_test = X_test
@@ -36,41 +37,7 @@ class StackingAttributes:
         self._final_pred = None
         self._final_pred_testsub = None
         self._final_pred_blindsub = None
-        
-        self._gb_n_estimators = 1000
-        self._gb_learning_rate = 0.01
-        
-    @property
-    def gb_n_estimators(self):
-        """"""
-        return self._gb_n_estimators
 
-    @gb_n_estimators.setter
-    def gb_n_estimators(self, value):
-        self._gb_n_estimators = value
-        
-    @property
-    def gb_learning_rate(self):
-        """"""
-        return self._gb_learning_rate
-
-    @gb_learning_rate.setter
-    def gb_learning_rate(self, value):
-        self._gb_learning_rate = value
-        
-        
-    @property
-    def rf_n_estimators(self):
-        """"""
-        return self._rf_n_estimators
-
-    @rf_n_estimators.setter
-    def rf_n_estimators(self, value):
-        self._rf_n_estimators = value
-        
-        
-        
-        
     @property
     def rf_n_estimators(self):
         """"""
@@ -200,6 +167,24 @@ class StackingAttributes:
     def kn_weights(self, value):
         self._kn_weights = value
         
+        
+    @property
+    def kn_random_state(self):
+        """"""
+        return self._kn_random_state
+
+    @kn_random_state.setter
+    def kn_random_state(self, value):
+        self._kn_random_state = value
+        
+    @property
+    def kn_n_jobs(self):
+        """"""
+        return self._kn_n_jobs
+
+    @kn_n_jobs.setter
+    def kn_n_jobs(self, value):
+        self._kn_n_jobs = value
 
         
     @property
