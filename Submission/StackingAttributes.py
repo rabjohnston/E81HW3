@@ -8,10 +8,11 @@ Created on Fri Oct 14 06:35:28 2016
 class StackingAttributes:
 
     def __init__(self, X_train, Y_train, X_test, Y_test, X_testsub, X_blindsub):
+        self._rf_use_rfe = False        
         self._rf_n_estimators = 100
-        self._rf_max_depth=175
-        self._rf_min_samples_split=9
-        self._rf_min_samples_leaf=1
+        self._rf_max_depth=20
+        self._rf_min_samples_split=15
+        self._rf_min_samples_leaf=15
         self._rf_random_state = 1,
         self._rf_n_jobs=-1
         
@@ -22,11 +23,13 @@ class StackingAttributes:
         self._svc_random_state = 2,
         self._svc_n_jobs=-1       
         
-        self._kn_n_neighbors=15
+        self._kn_n_neighbors=160
         self._kn_weights='distance'
-        self._kn_random_state = 2
+        self._kn_random_state = 3
         self._kn_n_jobs=-1    
-                                      
+          
+        self._lr_C = 0.0019
+                            
         self._X_train = X_train
         self._X_test = X_test
         self._X_testsub = X_testsub
@@ -37,7 +40,20 @@ class StackingAttributes:
         self._final_pred = None
         self._final_pred_testsub = None
         self._final_pred_blindsub = None
+        
+        self._final_model = None
 
+
+    @property
+    def rf_use_rfe(self):
+        """"""
+        return self._rf_use_rfe
+
+    @rf_use_rfe.setter
+    def rf_use_rfe(self, value):
+        self._rf_use_rfe = value
+        
+        
     @property
     def rf_n_estimators(self):
         """"""
@@ -92,7 +108,15 @@ class StackingAttributes:
     def rf_n_jobs(self, value):
         self._rf_n_jobs = value
         
+    @property
+    def lr_C(self):
+        """"""
+        return self._lr_C
 
+    @lr_C.setter
+    def lr_C(self, value):
+        self._lr_C = value
+        
     @property
     def svc_C(self):
         """"""
@@ -269,4 +293,11 @@ class StackingAttributes:
     def final_pred_blindsub(self, value):
         self._final_pred_blindsub = value
         
-        
+    @property
+    def final_model(self):
+        """"""
+        return self._final_model
+
+    @final_model.setter
+    def final_model(self, value):
+        self._final_model = value        

@@ -11,7 +11,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC # "Support Vector Classifier"
-
+from sklearn.feature_selection import RFE
 
 class Ensemble:
     
@@ -33,7 +33,12 @@ class Ensemble:
             min_samples_leaf = self.attrs.rf_min_samples_leaf,
             random_state = 1,
             n_jobs = self.attrs.rf_n_jobs)
-
+            
+        if self.attrs.rf_use_rfe:
+            if verbose > 0:
+                print(" using RFE")
+            Model1 = RFE(Model1, n_features_to_select = 150, step = 20)
+            
         Model1.fit(self.attrs.X_train, self.attrs.Y_train)
 
         #Predict on X_train, X_test
@@ -96,6 +101,20 @@ class Ensemble:
         Model5_pred_testsub = Model5.predict_proba(self.attrs.X_testsub)
         Model5_pred_blindsub = Model5.predict_proba(self.attrs.X_blindsub)
 
+        #Build Model6 - Level 0
+        if verbose > 0:
+            print("Logistic Regression Classifier")
+
+        Model6 = LogisticRegression(C = self.attrs.lr_C, 
+                                      random_state = 6)
+                            
+        Model6.fit(self.attrs.X_train, self.attrs.Y_train)
+        #Predict on X_train, X_test
+        Model6_pred_test = Model6.predict_proba(self.attrs.X_test)
+        Model6_pred_train = Model6.predict_proba(self.attrs.X_train)
+        Model6_pred_testsub = Model6.predict_proba(self.attrs.X_testsub)
+        Model6_pred_blindsub = Model6.predict_proba(self.attrs.X_blindsub)
+        
         #Final Model - Level 1 
         #Creating training attributes for the stacked model
         if verbose > 0:
@@ -105,26 +124,33 @@ class Ensemble:
                                     Model2_pred_train,
                                     Model3_pred_train,
                                     Model4_pred_train,
-                                    Model5_pred_train])  
+                                    Model5_pred_train,
+                                    Model6_pred_train])  
         ModelFinal = LogisticRegression(random_state=49)
         ModelFinal.fit(FeaturesTrain1, self.attrs.Y_train)
+
+        # Save the final model in case we want to work with it later
+        self.attrs.final_model = ModelFinal
 
         #Creating test attributes final model
         Features_test1 = np.hstack([Model1_pred_test,
                                     Model2_pred_test,
                                     Model3_pred_test,
                                     Model4_pred_test,
-                                    Model5_pred_test])
+                                    Model5_pred_test,
+                                    Model6_pred_test])
         Features_testsub1 = np.hstack([Model1_pred_testsub,
                                        Model2_pred_testsub,
                                        Model3_pred_testsub,
                                        Model4_pred_testsub,
-                                       Model5_pred_testsub])
+                                       Model5_pred_testsub,
+                                       Model6_pred_testsub])
         Features_blindsub1 = np.hstack([Model1_pred_blindsub,
                                         Model2_pred_blindsub,
                                         Model3_pred_blindsub,
                                         Model4_pred_blindsub,
-                                        Model5_pred_blindsub])
+                                        Model5_pred_blindsub,
+                                        Model6_pred_blindsub])
 
 
         #Final predictions
